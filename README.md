@@ -1,22 +1,36 @@
-# Assignment-4
-[![Generic badge](https://img.shields.io/badge/CV-Assignment:4-BLUE.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/DUE-23:59hrs,02/04/2021-RED.svg)](https://shields.io/)
+# Scene Recognition using Bag of Visual Words with Spatial Pyramid Matching
 
-The goal of the assignment is to familiarize you with face detection and scene recognition. This assignment has been prepared by Gowri Lekshmy and Prajwal Krishna. Please raise doubts on the appropriate assignment thread on moodle.
+This software implements a bag of visual words model to classify images belonging to a subset of the SUN dataset into 8 classes.
 
-# Instructions
-- Follow the directory structure as shown below:
-  ```
-  ├── src           
-        ├── Assignment4.ipynb  // your code
-  ├── dataset                   
-    ├── SUN_data 
-  ├── Assignment4.pdf 
-  └── README.md
-  ```
-- `src` should contain your Jupyter notebook.
-- `dataset` will contain images used for the second question.
-- Follow this directory structure for all following assignments in this course.
-- **Make sure you run your Jupyter notebook before committing, to save all outputs.**
+## Methodology
 
-For usage of other pkgs, please contact the TAs.
+- First a vocabulary of visual words is constructed by densely sampling SIFT features, and clustering them into visual words via K-means.
+- The training images are then represented as histograms of these visual words, which are TF-IDF re-weighted to enhance the importance of discriminative features.
+- One-vs-all linear SVM classifiers are then trained on these histograms.
+- At query-time, the test image is sampled densely for features, which are mapped to words using K-means to construct the histogram. This histogram is identically re-weighted and then passed through the SVM classifiers.
+
+**Spatial Pyramid Matching:**  
+Bag of visual words does not account for the spatial locations of occurence of the visual words. To account for this, spatial pyramid matching divides the image into $4^l$ regions at each level $l=0, 1, 2, ...$, and concatenates a weighted version of the histograms from each level, paying more attention to deeper levels, which are more spatially focussed <a href="#ref1">\[1\]</a>.
+
+**Experimentation:**  
+The effect of variations and parameter tuning and an analysis of this effect is also presented.
+
+## To run
+*All commands to be run from the repository root.*  
+1. Unzip the dataset.
+   ```(shell)
+   unzip dataset/SUN_data.zip -d dataset/
+   ```
+2. Install python packages from the Python Package Index (preferably in a virtual environment).
+   ```(shell)
+   python3 -m venv bovw-env && source bovw-env/bin/activate # optional
+   pip install -r requirements.txt
+   ```
+3. Run the notebook on a jupyter server.
+   ```(shell)
+   jupyter notebook
+   ```
+   Open `src/bovw.ipynb` in the web browser window.
+
+---
+<a id="ref1">[1]</a> Lazebnik, Svetlana & Schmid, Cordelia & Ponce, J.. (2006). Beyond Bags of Features: Spatial Pyramid Matching for Recognizing Natural Scene Categories. In CVPR. 2. 2169 - 2178. 10.1109/CVPR.2006.68. 
